@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LoL Draft Simulator</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>League Draft Helper</h1>
+      <p>
+        This tool simulates a basic champion drafting experience similar to League
+        of Legends. Draft champions for each team, manage bans, and see which
+        available champions synergize with your selected picks. Synergy is
+        calculated based on shared keyword tags.
+      </p>
+    </header>
+
+    <main>
+      <section id="status-panel">
+        <h2>Current Phase</h2>
+        <div id="phase-info"></div>
+      </section>
+
+      <section id="teams-container">
+        <!-- Overview lists for bans and picks remain for quick reference. -->
+        <div class="team" id="team1">
+          <h3>Blue Team</h3>
+          <div class="bans" id="team1-bans">
+            <h4>Bans</h4>
+            <ul></ul>
+          </div>
+          <div class="picks" id="team1-picks">
+            <h4>Picks</h4>
+            <ul></ul>
+          </div>
+        </div>
+        <div class="team" id="team2">
+          <h3>Red Team</h3>
+          <div class="bans" id="team2-bans">
+            <h4>Bans</h4>
+            <ul></ul>
+          </div>
+          <div class="picks" id="team2-picks">
+            <h4>Picks</h4>
+            <ul></ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="champion-list">
+        <h2>Available Champions</h2>
+        <p>Select a champion to draft it for the current phase. Synergies with
+        your existing picks will be highlighted.</p>
+        <!-- Lane filter buttons to allow users to sort champions by lane. Icons accompany labels for clarity. -->
+        <div id="lane-filter">
+          <span>Filter by lane:</span>
+          <button data-lane="All" class="lane-btn active">All</button>
+          <button data-lane="Top" class="lane-btn"><img src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/svg/position-top.svg" width="16" height="16" alt="Top"> Top</button>
+          <button data-lane="Jungle" class="lane-btn"><img src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/svg/position-jungle.svg" width="16" height="16" alt="Jungle"> Jungle</button>
+          <button data-lane="Mid" class="lane-btn"><img src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/svg/position-middle.svg" width="16" height="16" alt="Mid"> Mid</button>
+          <button data-lane="ADC" class="lane-btn"><img src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/svg/position-bottom.svg" width="16" height="16" alt="ADC"> ADC</button>
+          <button data-lane="Support" class="lane-btn"><img src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/svg/position-utility.svg" width="16" height="16" alt="Support"> Support</button>
+        </div>
+        <!-- Draft layout containing side panels and champion grid -->
+        <div id="draft-panels">
+          <div id="blue-panel" class="team-panel">
+            <h3>Blue Picks</h3>
+            <!-- Blue team side picks list -->
+            <div class="side-picks" id="blue-side-picks"></div>
+            <!-- Blue team comp tracker: shows progress for the Blue team only -->
+            <div class="comp-tracker" id="blue-comp-tracker"></div>
+          </div>
+          <div id="center-panel" style="flex: 1;">
+            <div id="champions-container"></div>
+          </div>
+          <div id="red-panel" class="team-panel">
+            <h3>Red Picks</h3>
+            <!-- Red team side picks list -->
+            <div class="side-picks" id="red-side-picks"></div>
+            <!-- Red team comp tracker: shows progress for the Red team only -->
+            <div class="comp-tracker" id="red-comp-tracker"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Finish screen: displayed when the draft is complete. Initially hidden. -->
+      <section id="finish-screen" style="display: none;">
+        <h2>Draft Results</h2>
+        <!-- Summary of bans -->
+        <div id="finish-bans" class="finish-section"></div>
+        <!-- Summary of picks with large images -->
+        <div id="finish-picks" class="finish-section"></div>
+        <!-- Summary of compositions achieved and lane distribution -->
+        <div id="finish-comps" class="finish-section"></div>
+        <!-- Restart button -->
+        <button id="restart-button">Restart Draft</button>
+      </section>
+
+      <!-- Audio elements for draft music and sound effects. These will be
+           controlled via script.js to play the appropriate sounds when
+           champions are picked or banned. Users can replace these audio
+           sources with their own files if desired. -->
+      <audio id="draft-music" src="audio/draft_music.wav" loop></audio>
+      <audio id="pick-sfx" src="audio/pick_sound.wav"></audio>
+      <audio id="ban-sfx" src="audio/ban_sound.wav"></audio>
+      <audio id="finish-music" src="audio/finish_music.wav" loop></audio>
+
+      <!-- Definitions for lanes and composition tags. These notes help
+           explain the meaning of each tag used in the draft simulator.
+           Feel free to adjust wording as needed for clarity. -->
+      <section id="comp-definitions">
+        <h2>Tag Definitions</h2>
+        <p>The lanes assigned are mostly based off professional play and reflect the current state of League of Legends as of 6 Aug 2025.</p>
+        <ul>
+          <li><strong>Wombo Combo:</strong> This champion has great area-of-effect damage or crowd control abilities, or has excellent synergy with champions who possess such abilities.</li>
+          <li><strong>Dive:</strong> Self‑explanatory – these champions excel at diving into enemies and initiating fights.</li>
+          <li><strong>Front‑to‑Back:</strong> This champion can protect their backline well, focuses on the enemy’s frontline, or acts as a backline carry with strong sustained DPS.</li>
+          <li><strong>Poke:</strong> This champion deals great long‑range poke damage that can harass and wear down enemies.</li>
+          <li><strong>Pick:</strong> This champion is adept at catching or crowd-controlling an enemy from afar.</li>
+        </ul>
+      </section>
+    </main>
+
+    <!-- Load champion data first, then main script -->
+    <script src="champData.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
